@@ -1,10 +1,14 @@
 FROM fedora
 MAINTAINER https://github.com/klashxx
 
+LABEL version="1.0"
+LABEL description="Minimal installation oracle 12c"
+
 # Update the container
 RUN dnf upgrade --best --assumeyes --setopt=deltarpm=false 
 
 RUN dnf install binutils \
+                unzip \
                 compat-libstdc++-33 \
                 compat-libstdc++-33.i686 \
                 gcc \
@@ -32,4 +36,11 @@ RUN dnf install binutils \
                 unixODBC-devel \
                 zlib-devel --assumeyes --best
 
-RUN dnf clean all 
+RUN dnf clean all
+
+ADD linuxamd64_12102_database_1of2.zip /tmp/orainstall/linuxamd64_12102_database_1of2.zip
+ADD linuxamd64_12102_database_2of2.zip /tmp/orainstall/linuxamd64_12102_database_2of2.zip
+
+ADD oracle12c.sh /tmp/oracle12c.sh
+
+RUN ["/tmp/oracle12c.sh", "unpacking"]
