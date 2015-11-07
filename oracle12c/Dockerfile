@@ -42,10 +42,7 @@ RUN groupadd -g 54321 oinstall && groupadd -g 54322 dba
 RUN useradd -u 54321 -g oinstall -G dba oracle
 RUN echo "oracle:oracle" | chpasswd
 
-ADD linuxamd64_12102_database_1of2.zip /tmp/orainstall/linuxamd64_12102_database_1of2.zip
-ADD linuxamd64_12102_database_2of2.zip /tmp/orainstall/linuxamd64_12102_database_2of2.zip
+ADD database/*  /tmp/orainstall/database/
 ADD oracle12c.sh /tmp/oracle12c.sh
 ADD sysctl.conf /etc/sysctl.conf
 
-
-RUN ["/tmp/oracle12c.sh", "unpacking"]
