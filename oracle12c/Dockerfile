@@ -1,12 +1,12 @@
 FROM fedora
 MAINTAINER https://github.com/klashxx
-
 LABEL version="1.0"
 LABEL description="oracle database 12c Minimal installation"
 
 # Update the container
 RUN dnf upgrade --best --assumeyes --setopt=deltarpm=false 
 
+# Install necesary packages && final cleanup
 RUN dnf install binutils \
                 unzip \
                 compat-libstdc++-33 \
@@ -36,6 +36,7 @@ RUN dnf install binutils \
                 unixODBC-devel \
                 zlib-devel --assumeyes --best && dnf clean all
 
+# Adding user oracle, helper groups and FS
 RUN groupadd -g 54321 oinstall && \
     groupadd -g 54322 dba && \
     useradd -u 54321 -g oinstall -G dba oracle && \
@@ -46,21 +47,27 @@ RUN groupadd -g 54321 oinstall && \
     chown oracle:dba -R /u01 /tmp/orainstall && \
     echo "oracle:oracle" | chpasswd
 
+# Configuration files
 ADD sysctl.conf /etc/sysctl.conf
 
+# Sofware installation must be done as oracle
 USER oracle
+
+# Response file
 ADD ora12c_software.rsp /tmp/orainstall/
 ADD oracle12c.sh /tmp/oracle12c.sh
+
+# Adding databasesoftware
 ADD linuxamd64_12102_database_*.zip /tmp/orainstall/
 
 WORKDIR /tmp/orainstall/
 RUN unzip linuxamd64_12102_database_1of2.zip && unzip linuxamd64_12102_database_2of2.zip
-WORKDIR /tmp/orainstall
 
+# Unattended install
 RUN ./database/runInstaller -silent \
                             -responseFile /tmp/orainstall/ora12c_software.rsp \
                             -noconfig -force
-
+# Clean up
 RUN rm linuxamd64_12102_database_*.zip && rm -rf database/
 
 
