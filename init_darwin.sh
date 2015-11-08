@@ -27,7 +27,7 @@ if [ $VM_EXISTS_CODE -eq 1 ]; then
   rm -rf ~/.docker/machine/machines/$VM
   $DOCKER_MACHINE create -d virtualbox \
                          --virtualbox-memory 2048 \
-                         --virtualbox-disk-size=30000 $VM
+                         --virtualbox-disk-size=40000 $VM
 else
   echo "Machine $VM already exists in VirtualBox."
 fi
