@@ -48,26 +48,38 @@ RUN groupadd -g 54321 oinstall && \
     echo "oracle:oracle" | chpasswd
 
 # Configuration files
-ADD sysctl.conf /etc/sysctl.conf
+COPY sysctl.conf /etc/sysctl.conf
 
 # Sofware installation must be done as oracle
 USER oracle
 
-# Response file
-ADD ora12c_software.rsp /tmp/orainstall/
-ADD oracle12c.sh /tmp/oracle12c.sh
+# Install script
+COPY oracle12c.sh /tmp/oracle12c.sh
 
 # Adding databasesoftware
-ADD linuxamd64_12102_database_*.zip /tmp/orainstall/
+COPY linuxamd64_12102_database_*.zip /tmp/orainstall/
 
 WORKDIR /tmp/orainstall/
 RUN unzip linuxamd64_12102_database_1of2.zip && unzip linuxamd64_12102_database_2of2.zip
+RUN rm linuxamd64_12102_database_*.zip
 
-# Unattended install
-RUN ./database/runInstaller -silent \
-                            -responseFile /tmp/orainstall/ora12c_software.rsp \
-                            -noconfig -force
+# Unattended install [Doc ID 885643.1]
+RUN database/runInstaller -silent -debug -force \
+                          FROM_LOCATION=/tmp/orainstall/database/Disk1/stage/products.xml \
+                          oracle.install.option=INSTALL_DB_SWONLY \
+                          UNIX_GROUP_NAME=oinstall \
+                          INVENTORY_LOCATION=/u01/app/oraInventory \
+                          ORACLE_HOME=/u01/app/oracle/product/12.1.0/dbhome_1 \
+                          ORACLE_HOME_NAME="OraDb12c_Home1" \
+                          ORACLE_BASE=/u01/app/oracle \
+                          oracle.install.db.InstallEdition=EE \
+                          oracle.install.db.DBA_GROUP=dba \
+                          oracle.install.db.OPER_GROUP=dba \
+                          oracle.install.db.BACKUPDBA_GROUP=dba \
+                          oracle.install.db.DGDBA_GROUP=dba \
+                          oracle.install.db.KMDBA_GROUP=dba \
+                          DECLINE_SECURITY_UPDATES=true
 # Clean up
-RUN rm linuxamd64_12102_database_*.zip && rm -rf database/
+# RUN rm -rf database/
 
 
