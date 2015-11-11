@@ -4,10 +4,8 @@ LABEL version="1.0"
 LABEL description="oracle database 12c Minimal installation"
 
 # Weird but sometimes dnf is missing
-RUN yum install dnf  --assumeyes
-
-# Update the container
-RUN dnf upgrade --best --assumeyes --setopt=deltarpm=false 
+RUN yum install dnf  --assumeyes && \
+    dnf upgrade --best --assumeyes --setopt=deltarpm=false 
 
 # Install necesary packages && final cleanup
 RUN dnf install binutils \
@@ -50,12 +48,14 @@ USER oracle
 # Install script
 COPY oracle12c.sh /tmp/oracle12c.sh
 
-# Adding databasesoftware
+# Adding database software
 COPY linuxamd64_12102_database_*.zip /tmp/orainstall/
 
+
 WORKDIR /tmp/orainstall/
-RUN unzip linuxamd64_12102_database_1of2.zip && unzip linuxamd64_12102_database_2of2.zip
-RUN rm linuxamd64_12102_database_*.zip
+RUN unzip linuxamd64_12102_database_1of2.zip && \
+    unzip linuxamd64_12102_database_2of2.zip && \
+    rm linuxamd64_12102_database_*.zip
 
 # Unattended install [Doc ID 885643.1]
 RUN database/runInstaller -silent -debug -waitforcompletion \
@@ -74,8 +74,7 @@ RUN database/runInstaller -silent -debug -waitforcompletion \
                           oracle.install.db.KMDBA_GROUP=dba \
                           oracle.install.cvu.getSharedPartitionList=false \
                           oracle.install.cvu.checkSharedStorageFileSystemType=false \
-                          DECLINE_SECURITY_UPDATES=true
-# Clean up
-RUN rm -rf database/
+                          DECLINE_SECURITY_UPDATES=true && sleep 100 && rm -rf database/
+
 
 
