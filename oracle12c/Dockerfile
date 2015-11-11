@@ -38,6 +38,7 @@ RUN groupadd -g 54321 oinstall && \
     mkdir -p /etc/oraInventory/ && \
     mkdir -p /u01/app/oracle/product/12.1.0/db_1 && \
     chown -R oracle:oinstall /u01 /tmp/orainstall /etc/oraInventory/ && \
+    echo "root:alpine" | chpasswd \
     echo "oracle:oracle" | chpasswd
 
 # Configuration files
