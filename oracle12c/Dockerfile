@@ -34,6 +34,11 @@ RUN groupadd -g 54321 oinstall && \
     mkdir -p /u01/logs/ && \
     mkdir -p /tmp/orainstall/ && \
     mkdir -p /etc/oraInventory/ && \
+    mkdir -p /u01/app/oracle/oradata/edie && \
+    mkdir -p /u01/app/oracle/admin/edie/adump && \
+    mkdir -p /u01/app/oracle/admin/edie/dpdump && \
+    mkdir -p /u01/app/oracle/admin/edie/pfile && \
+    mkdir -p /u01/app/oracle/admin/edie/scripts && \
     mkdir -p /u01/app/oracle/product/12.1.0/db_1 && \
     chown -R oracle:oinstall /u01 /tmp/orainstall /etc/oraInventory/ && \
     echo "oracle:oracle" | chpasswd
@@ -74,10 +79,19 @@ COPY oracle12c_profile.sh /home/oracle/
 # Install script
 COPY oracle12c.sh /tmp/oracle12c.sh
 
+COPY initedie.ora /u01/app/oracle/product/12.1.0/db_1/dbs/
+
+# root scripts must be executed , we also need
+# to increase shm and do some housekeeping
 USER root
-RUN /etc/oraInventory/orainstRoot.sh && /u01/app/oracle/product/12.1.0/db_1/root.sh
+RUN /etc/oraInventory/orainstRoot.sh && \
+    /u01/app/oracle/product/12.1.0/db_1/root.sh && \
+    rm -rf /tmp/orainstall/database/
+
+RUN /usr/bin/mount -t tmpfs shmfs -o size=2g /dev/shm
 
 USER oracle
-
+COPY createdb.sql /tmp/orainstall/
+RUN source /home/oracle/oracle12c_profile.sh && sqlplus /nolog @createdb
 
 
