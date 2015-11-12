@@ -36,7 +36,6 @@ RUN groupadd -g 54321 oinstall && \
     mkdir -p /etc/oraInventory/ && \
     mkdir -p /u01/app/oracle/product/12.1.0/db_1 && \
     chown -R oracle:oinstall /u01 /tmp/orainstall /etc/oraInventory/ && \
-    echo "root:alpine" | chpasswd \
     echo "oracle:oracle" | chpasswd
 
 # Configuration files
@@ -45,17 +44,11 @@ COPY sysctl.conf /etc/sysctl.conf
 # Sofware installation must be done as oracle
 USER oracle
 
-# Install script
-COPY oracle12c.sh /tmp/oracle12c.sh
-
-# Adding database software
-COPY linuxamd64_12102_database_*.zip /tmp/orainstall/
-
+# Adding database software should be inflated externally
+# to keep image size under control :(
+COPY database/ /tmp/orainstall/database/
 
 WORKDIR /tmp/orainstall/
-RUN unzip linuxamd64_12102_database_1of2.zip && \
-    unzip linuxamd64_12102_database_2of2.zip && \
-    rm linuxamd64_12102_database_*.zip
 
 # Unattended install [Doc ID 885643.1]
 RUN database/runInstaller -silent -debug -waitforcompletion \
@@ -74,7 +67,17 @@ RUN database/runInstaller -silent -debug -waitforcompletion \
                           oracle.install.db.KMDBA_GROUP=dba \
                           oracle.install.cvu.getSharedPartitionList=false \
                           oracle.install.cvu.checkSharedStorageFileSystemType=false \
-                          DECLINE_SECURITY_UPDATES=true && sleep 100 && rm -rf database/
+                          DECLINE_SECURITY_UPDATES=true
+
+# Profile
+COPY oracle12c_profile.sh /home/oracle/
+# Install script
+COPY oracle12c.sh /tmp/oracle12c.sh
+
+USER root
+RUN /etc/oraInventory/orainstRoot.sh && /u01/app/oracle/product/12.1.0/db_1/root.sh
+
+USER oracle
 
 
 
