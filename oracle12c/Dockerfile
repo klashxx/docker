@@ -4,10 +4,8 @@ LABEL version="1.0"
 LABEL description="oracle database 12c Minimal installation"
 
 # Weird but sometimes dnf is missing
-RUN yum install dnf  --assumeyes
-
-# Update the container
-RUN dnf upgrade --best --assumeyes --setopt=deltarpm=false 
+RUN yum install dnf  --assumeyes && \
+    dnf upgrade --best --assumeyes --setopt=deltarpm=false 
 
 # Install necesary packages && final cleanup
 RUN dnf install binutils \
@@ -46,15 +44,11 @@ COPY sysctl.conf /etc/sysctl.conf
 # Sofware installation must be done as oracle
 USER oracle
 
-# Install script
-COPY oracle12c.sh /tmp/oracle12c.sh
-
-# Adding databasesoftware
-COPY linuxamd64_12102_database_*.zip /tmp/orainstall/
+# Adding database software should be inflated externally
+# to keep image size under control :(
+COPY database/ /tmp/orainstall/database/
 
 WORKDIR /tmp/orainstall/
-RUN unzip linuxamd64_12102_database_1of2.zip && unzip linuxamd64_12102_database_2of2.zip
-RUN rm linuxamd64_12102_database_*.zip
 
 # Unattended install [Doc ID 885643.1]
 RUN database/runInstaller -silent -debug -waitforcompletion \
@@ -74,7 +68,16 @@ RUN database/runInstaller -silent -debug -waitforcompletion \
                           oracle.install.cvu.getSharedPartitionList=false \
                           oracle.install.cvu.checkSharedStorageFileSystemType=false \
                           DECLINE_SECURITY_UPDATES=true
-# Clean up
-RUN rm -rf database/
+
+# Profile
+COPY oracle12c_profile.sh /home/oracle/
+# Install script
+COPY oracle12c.sh /tmp/oracle12c.sh
+
+USER root
+RUN /etc/oraInventory/orainstRoot.sh && /u01/app/oracle/product/12.1.0/db_1/root.sh
+
+USER oracle
+
 
 
