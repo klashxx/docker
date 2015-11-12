@@ -1,4 +1,4 @@
-# **oracle12c** Database on **fedora** Docker image
+### **oracle12c** Database on Fedora Docker Image
 
 Software files for Enterprise Edition ``12.1.0.2.0``:
 
@@ -14,4 +14,6 @@ Goals:
 - [ ] Networking and utilities.
 
 All should be accomplished in just **one step** by **one ``Dockerfile``**.
- 
+
+**Test**: ``docker run --privileged=true -i -t fedora/oracle12c /bin/bash``
+
