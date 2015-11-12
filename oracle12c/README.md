@@ -13,10 +13,10 @@ Goals:
 - [ ] Database creation.
 - [ ] Networking and utilities.
 
-~~All should be accomplished in just **one step** by **one ``Dockerfile``** ~~
+~~All~~ ~~should~~ ~~be~~ ~~accomplished~~ ~~in~~ ~~just~~ ~~one~~ ~~step~~ ~~by~~ ~~one~~ ~~Dockerfile~~
 
-After hitting **issue** docker/docker#1916 :disappointed::disappointed: ... this will need to be a 
-*2 steps* workflow (``mount``requires ``privileged`` access to the container).
+After hitting **issue** ``docker/docker#1916`` :disappointed: :disappointed: ... this will need to be a 
+*2 steps* workflow as ``mount`` requires ``privileged`` access to the ``container``.
 
 **Test**: ``docker run --privileged=true -i -t fedora/oracle12c /bin/bash``
 
