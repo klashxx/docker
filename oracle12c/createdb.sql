@@ -1,9 +1,14 @@
+SET ECHO ON
+SET VERIFY OFF
+
+connect "SYS"/"change_me" as SYSDBA
+startup nomount;
+
+spool /tmp/orainstall/dbcreation.log append
+
 CREATE DATABASE edie
    USER SYS IDENTIFIED BY change_me
    USER SYSTEM IDENTIFIED BY change_me
-   LOGFILE GROUP 1 ('/u01/logs/redo01a.log','/u02/logs/redo01b.log') SIZE 100M BLOCKSIZE 512,
-           GROUP 2 ('/u01/logs/redo02a.log','/u02/logs/redo02b.log') SIZE 100M BLOCKSIZE 512,
-           GROUP 3 ('/u01/logs/redo03a.log','/u02/logs/redo03b.log') SIZE 100M BLOCKSIZE 512
    MAXLOGHISTORY 1
    MAXLOGFILES 16
    MAXLOGMEMBERS 3
@@ -26,4 +31,8 @@ CREATE DATABASE edie
       SIZE 200M REUSE AUTOEXTEND ON NEXT 5120K MAXSIZE UNLIMITED
    USER_DATA TABLESPACE usertbs
       DATAFILE '/u01/app/oracle/oradata/edie/usertbs01.dbf'
-      SIZE 200M REUSE AUTOEXTEND ON MAXSIZE UNLIMITED;
+      SIZE 200M REUSE AUTOEXTEND ON MAXSIZE UNLIMITED
+   LOGFILE GROUP 1 ('/u01/logs/redo01a.log','/u01/logs/redo01b.log') SIZE 100M,
+           GROUP 2 ('/u01/logs/redo02a.log','/u01/logs/redo02b.log') SIZE 100M,
+           GROUP 3 ('/u01/logs/redo03a.log','/u01/logs/redo03b.log') SIZE 100M;
+
