@@ -1,0 +1,4 @@
+FROM fedora/ora12c_soft
+USER oracle
+WORKDIR /tmp/orainstall/
+RUN source /home/oracle/oracle12c_profile.sh && sqlplus /nolog @createdb
