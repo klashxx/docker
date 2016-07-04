@@ -18,7 +18,7 @@ Goals:
 After hitting **issue** ``docker/docker#1916`` :disappointed: :disappointed: ... this will need to be a
 *2 steps* workflow as ``mount`` requires ``privileged`` access to the ``container``.
 
-**Test**: ``docker run --privileged=true -i -t fedora/oracle12c /bin/bash``
+**Test**: ``docker run --privileged=true -i -t fedora/ora12c_sw /bin/bash``
 
 [license-url]: https://github.com/klashxx/docker/tree/master/oracle12c/blob/master/LICENSE.txt
 [license-svg]: https://img.shields.io/badge/license-MIT-red.svg
