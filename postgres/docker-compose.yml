@@ -1,0 +1,16 @@
+postgres9:
+  image: postgres:9.6
+  ports:
+    - 5432:5432
+  volumes_from:
+    - pg_data
+  environment:
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_USER: postgres
+    PGDATA : /var/lib/postgresql/data/pgdata
+
+pg_data:
+  image: alpine:latest
+  volumes:
+    - /Users/klashxx/Documents/PostgreSQL/9.6/data:/var/lib/postgresql/data:z
+  command: "true"
